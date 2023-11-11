@@ -4,4 +4,4 @@ var host = new HostBuilder()
     .ConfigureFunctionsWorkerDefaults()
     .Build();
 
-await host.RunAsync();
+host.Run();

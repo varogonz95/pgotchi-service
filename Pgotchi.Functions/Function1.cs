@@ -15,16 +15,18 @@ namespace Pgotchi.Functions
         }
 
         [Function("Function1")]
-        public HttpResponseData Run([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequestData req)
+        public HttpResponseData Run(
+            [WebPubSubTrigger(WebPubSubEventType.User, "deviceConfigChanged")] WebPubSubEventRequest request,
+            [WebPubSubConnectionInput])
         {
             _logger.LogInformation("C# HTTP trigger function processed a request.");
 
-            var response = req.CreateResponse(HttpStatusCode.OK);
-            response.Headers.Add("Content-Type", "text/plain; charset=utf-8");
+            //var response = request.CreateResponse(HttpStatusCode.OK);
+            //response.Headers.Add("Content-Type", "text/plain; charset=utf-8");
 
-            response.WriteString("Welcome to Azure Functions!");
+            //response.WriteString("Welcome to Azure Functions!");
 
-            return response;
+            return null;
         }
     }
 }

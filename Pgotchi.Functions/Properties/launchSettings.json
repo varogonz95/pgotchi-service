@@ -2,8 +2,13 @@
   "profiles": {
     "Pgotchi.Functions": {
       "commandName": "Project",
-      "commandLineArgs": "--port 7038",
-      "launchBrowser": false
+      "commandLineArgs": "--port 7246"
+    },
+    "Docker": {
+      "commandName": "Docker",
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
+      "httpPort": 30253,
+      "useSSL": false
     }
   }
 }
