@@ -7,9 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pgotchi.Data", "Pgotchi.Dat
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pgotchi.Apis", "Pgotchi.Apis\Pgotchi.Apis.csproj", "{113D3667-D07B-45DB-870D-2B8A07B4946B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pgotchi.Core", "PgotchiService.Core\Pgotchi.Core.csproj", "{F4271B8C-72D1-4C5B-AC0A-6F321D4973AC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pgotchi.Core", "Pgotchi.Core\Pgotchi.Core.csproj", "{F4271B8C-72D1-4C5B-AC0A-6F321D4973AC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pgotchi.Functions", "Pgotchi.Functions\Pgotchi.Functions.csproj", "{785CCA37-0AA6-4D75-9035-6C65203B7733}"
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "Pgotchi.FeaturesPlayground", "Pgotchi.FeaturesPlayground\Pgotchi.FeaturesPlayground.esproj", "{9F77D452-6A33-4061-B603-B36728A3BE09}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,10 +29,12 @@ Global
 		{F4271B8C-72D1-4C5B-AC0A-6F321D4973AC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F4271B8C-72D1-4C5B-AC0A-6F321D4973AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F4271B8C-72D1-4C5B-AC0A-6F321D4973AC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{785CCA37-0AA6-4D75-9035-6C65203B7733}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{785CCA37-0AA6-4D75-9035-6C65203B7733}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{785CCA37-0AA6-4D75-9035-6C65203B7733}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{785CCA37-0AA6-4D75-9035-6C65203B7733}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9F77D452-6A33-4061-B603-B36728A3BE09}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F77D452-6A33-4061-B603-B36728A3BE09}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F77D452-6A33-4061-B603-B36728A3BE09}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{9F77D452-6A33-4061-B603-B36728A3BE09}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F77D452-6A33-4061-B603-B36728A3BE09}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9F77D452-6A33-4061-B603-B36728A3BE09}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
