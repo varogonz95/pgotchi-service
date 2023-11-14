@@ -4,6 +4,12 @@
 # Azure Functions localsettings file
 local.settings.json
 
+# Local Development App Settings
+appsettings.*.json
+
+# Azurite files
+__azurite*__.json
+
 # User-specific files
 *.suo
 *.user
@@ -262,6 +268,3 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
-
-# Local Development App Settings
-appsettings.*.json

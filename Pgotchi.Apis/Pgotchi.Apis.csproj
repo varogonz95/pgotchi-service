@@ -9,14 +9,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.4" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.Newtonsoft" Version="6.5.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Pgotchi.Core\Pgotchi.Core.csproj" />
     <ProjectReference Include="..\Pgotchi.Data\Pgotchi.Data.csproj" />
-    <ProjectReference Include="..\PgotchiService.Core\Pgotchi.Core.csproj" />
   </ItemGroup>
 
 </Project>
