@@ -7,9 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pgotchi.Data", "Pgotchi.Dat
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pgotchi.Apis", "Pgotchi.Apis\Pgotchi.Apis.csproj", "{113D3667-D07B-45DB-870D-2B8A07B4946B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pgotchi.Core", "PgotchiService.Core\Pgotchi.Core.csproj", "{F4271B8C-72D1-4C5B-AC0A-6F321D4973AC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pgotchi.Core", "Pgotchi.Core\Pgotchi.Core.csproj", "{F4271B8C-72D1-4C5B-AC0A-6F321D4973AC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pgotchi.Functions", "Pgotchi.Functions\Pgotchi.Functions.csproj", "{785CCA37-0AA6-4D75-9035-6C65203B7733}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pgotchi.Functions", "Pgotchi.Functions\Pgotchi.Functions.csproj", "{785CCA37-0AA6-4D75-9035-6C65203B7733}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -12,11 +12,15 @@ public class Function
         _logger = loggerFactory.CreateLogger<Function>();
     }
 
-    [Function("Function")]
-    public UserEventResponse Run(
-        [WebPubSubTrigger("TestHub", WebPubSubEventType.User, "message")] UserEventRequest request)
+    [Function("message")]
+    [WebPubSubOutput(Hub = "TestHub")]
+    public SendToAllAction Run(
+    [WebPubSubTrigger("TestHub", WebPubSubEventType.User, "message")] UserEventRequest request)
     {
-        _logger.LogDebug("UserEventRequest: {request}", request);
-        return new("Hello world!");
+        return new SendToAllAction
+        {
+            Data = BinaryData.FromString($"[{request.ConnectionContext.UserId}] {request.Data}"),
+            DataType = request.DataType
+        };
     }
 }
