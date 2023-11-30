@@ -9,6 +9,8 @@ appsettings.*.json
 
 # Azurite files
 __azurite*__.json
+__queuestorage__/
+__blobstorage__/
 
 # User-specific files
 *.suo
