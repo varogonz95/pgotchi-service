@@ -1,8 +1,7 @@
 {
   "profiles": {
     "Pgotchi.Functions": {
-      "commandName": "Project",
-      "commandLineArgs": "--port 7248"
+      "commandName": "Project"
     },
     "Docker": {
       "commandName": "Docker",
