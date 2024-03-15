@@ -2,14 +2,6 @@
     "IsEncrypted": false,
     "Values": {
         "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
-        "AzureWebJobsStorage": "UseDevelopmentStorage=true",
-        "WebPubSubConnectionString": ""
-    },
-    "Host": {
-        "LocalHttpPort": 7071,
-        "CORS": "*",
-        "CORSCredentials": false
-    },
-    "ConnectionStrings": {
+        "AzureWebJobsStorage": "UseDevelopmentStorage=true"
     }
 }
