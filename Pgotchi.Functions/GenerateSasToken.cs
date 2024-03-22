@@ -42,7 +42,11 @@ public class GenerateSasToken(ILogger<GenerateSasToken> logger)
 
     [Function(nameof(GenerateSasToken))]
     public async Task<IActionResult> Run(
+#if DEBUG
         [HttpTrigger(AuthorizationLevel.Anonymous, "post")]
+#else
+        [HttpTrigger(AuthorizationLevel.Function, "post")]
+#endif 
         [FromBody]
         SasTokenRequest request)
     {
