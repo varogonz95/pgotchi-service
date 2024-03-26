@@ -9,7 +9,7 @@ using System.Security.Cryptography;
 using System.Text;
 using FromBodyAttribute = Microsoft.Azure.Functions.Worker.Http.FromBodyAttribute;
 
-namespace Pgotchi.Functions;
+namespace Pgotchi.Functions.Functions;
 
 public sealed class SasTokenRequest
 {
