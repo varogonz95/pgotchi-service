@@ -75,7 +75,7 @@ public class GenerateSasToken(ILogger<GenerateSasToken> logger)
         {
             StatusCode = StatusCodes.Status200OK,
             Content = await content.ToStringAsync(),
-            ContentType = "application/json; charset=utf-8"
+            ContentType = Constants.DefaultContentType,
         };
     }
 }

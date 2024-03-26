@@ -1,8 +1,10 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Devices;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Net.Http.Json;
 using System.Security.Cryptography;
 using FromBodyAttribute = Microsoft.Azure.Functions.Worker.Http.FromBodyAttribute;
 
@@ -19,6 +21,8 @@ public sealed class DeviceSummary
     public DeviceConnectionState ConnectionState { get; set; }
     public DeviceStatus Status { get; set; }
     public AuthenticationMechanism Authentication { get; set; } = null!;
+
+    public Task<string> ToStringAsync() => JsonContent.Create(this).ReadAsStringAsync();
 }
 
 public class RegisterDevice(ILogger<RegisterDevice> logger, IOptions<AzureIotHubOptions> options)
@@ -44,7 +48,7 @@ public class RegisterDevice(ILogger<RegisterDevice> logger, IOptions<AzureIotHub
 
         try
         {
-            device = 
+            device =
                 await registryManager.GetDeviceAsync(request.DeviceId, cancellationToken) ??
                 await registryManager.AddDeviceAsync(
                     new Device(request.DeviceId)
@@ -66,13 +70,20 @@ public class RegisterDevice(ILogger<RegisterDevice> logger, IOptions<AzureIotHub
             throw;
         }
 
-        return new CreatedResult(configOptions.ToDeviceUri(device.Id), new DeviceSummary
+        var summary = new DeviceSummary
         {
             Id = device.Id,
             ConnectionState = device.ConnectionState,
             Status = device.Status,
             Authentication = device.Authentication,
-        });
+        };
+
+        return new ContentResult
+        {
+            Content = await summary.ToStringAsync(),
+            ContentType = Constants.DefaultContentType,
+            StatusCode = StatusCodes.Status201Created,
+        };
     }
 
     private static string GenerateDeviceId()
