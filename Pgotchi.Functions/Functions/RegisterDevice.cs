@@ -20,7 +20,11 @@ public sealed class DeviceSummary
     public required string Id { get; set; }
     public DeviceConnectionState ConnectionState { get; set; }
     public DeviceStatus Status { get; set; }
-    public AuthenticationMechanism Authentication { get; set; } = null!;
+    public AuthenticationType AuthenticationType { get; set; }
+    public string? SymmetricPrimaryKey { get; set; }
+    public string? SymmetricSecondaryKey { get; set; }
+    public string? X509PrimaryThumbprint { get; set; }
+    public string? X509SecondaryThumbprint { get; set; }
 
     public Task<string> ToStringAsync() => JsonContent.Create(this).ReadAsStringAsync();
 }
@@ -75,7 +79,11 @@ public class RegisterDevice(ILogger<RegisterDevice> logger, IOptions<AzureIotHub
             Id = device.Id,
             ConnectionState = device.ConnectionState,
             Status = device.Status,
-            Authentication = device.Authentication,
+            AuthenticationType = device.Authentication.Type,
+            SymmetricPrimaryKey = device.Authentication.SymmetricKey?.PrimaryKey,
+            SymmetricSecondaryKey = device.Authentication.SymmetricKey?.SecondaryKey,
+            X509PrimaryThumbprint = device.Authentication.X509Thumbprint?.PrimaryThumbprint,
+            X509SecondaryThumbprint = device.Authentication.X509Thumbprint?.SecondaryThumbprint,
         };
 
         return new ContentResult
