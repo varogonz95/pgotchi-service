@@ -1,7 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Pgotchi.Functions;
-using System.Text.Json;
 
 var host = new HostBuilder()
     .ConfigureFunctionsWebApplication(builder =>
