@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Net.Http.Json;
 using System.Security.Cryptography;
+using System.Text.Json;
 using FromBodyAttribute = Microsoft.Azure.Functions.Worker.Http.FromBodyAttribute;
 
 namespace Pgotchi.Functions.Functions;
@@ -41,6 +42,8 @@ public class RegisterDevice(ILogger<RegisterDevice> logger, IOptions<AzureIotHub
 #endif 
         [FromBody]
         RegisterDeviceRequest request,
+        [FromQuery]
+        string namingStrategy,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
@@ -86,17 +89,25 @@ public class RegisterDevice(ILogger<RegisterDevice> logger, IOptions<AzureIotHub
             X509SecondaryThumbprint = device.Authentication.X509Thumbprint?.SecondaryThumbprint,
         };
 
-        return new ContentResult
+        var jsonSettings = new JsonSerializerOptions(JsonSerializerDefaults.General)
         {
-            Content = await summary.ToStringAsync(),
-            ContentType = Constants.DefaultContentType,
-            StatusCode = StatusCodes.Status201Created,
+            PropertyNamingPolicy = ResolveJsonNamingPolicy(namingStrategy),
         };
+
+        return new JsonResult(summary, jsonSettings);
     }
 
-    private static string GenerateDeviceId()
+    private static JsonNamingPolicy ResolveJsonNamingPolicy(string namingStrategy)
     {
-        return Guid.NewGuid().ToString();
+        return string.IsNullOrWhiteSpace(namingStrategy) ? JsonNamingPolicy.CamelCase : namingStrategy switch
+        {
+            "snakeCaseUpper" => JsonNamingPolicy.SnakeCaseUpper,
+            "snakeCaseLower" => JsonNamingPolicy.SnakeCaseLower,
+            "kebabCaseUpper" => JsonNamingPolicy.KebabCaseUpper,
+            "kebabCaseLower" => JsonNamingPolicy.KebabCaseLower,
+            "capitalCase" => new JsonCapitalCaseNamingPolicy(),
+            _ => JsonNamingPolicy.CamelCase,
+        };
     }
 
     private static string GenerateKey(int keySize)
