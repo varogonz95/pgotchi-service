@@ -1,9 +1,9 @@
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Devices;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Pgotchi.Functions.Extensions;
 using System.Net.Http.Json;
 using System.Security.Cryptography;
 using System.Text.Json;
@@ -30,7 +30,7 @@ public sealed class DeviceSummary
     public Task<string> ToStringAsync() => JsonContent.Create(this).ReadAsStringAsync();
 }
 
-public class RegisterDevice(ILogger<RegisterDevice> logger, IOptions<AzureIotHubOptions> options)
+public class RegisterDevice(ILogger<RegisterDevice> logger, IOptions<AzureIotHubOptions> azureIotHubOptions, IOptions<JsonSerializerOptions> jsonSerializerOptions)
 {
 
     [Function("RegisterDevice")]
@@ -42,73 +42,42 @@ public class RegisterDevice(ILogger<RegisterDevice> logger, IOptions<AzureIotHub
 #endif 
         [FromBody]
         RegisterDeviceRequest request,
-        [FromQuery]
-        string namingStrategy,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var configOptions = options.Value;
-        using var registryManager = RegistryManager.CreateFromConnectionString(configOptions.ConnectionString);
-
-        Device device;
-
         try
         {
-            device =
-                await registryManager.GetDeviceAsync(request.DeviceId, cancellationToken) ??
-                await registryManager.AddDeviceAsync(
-                    new Device(request.DeviceId)
-                    {
-                        Authentication = new()
-                        {
-                            Type = AuthenticationType.Sas,
-                            SymmetricKey = new()
-                            {
-                                PrimaryKey = GenerateKey(32),
-                                SecondaryKey = GenerateKey(32),
-                            },
-                        }
-                    }, cancellationToken);
+            using var registryManager = RegistryManager.CreateFromConnectionString(azureIotHubOptions.Value.ConnectionString);
+            var primaryKey = GenerateKey(32);
+            var secondaryKey = GenerateKey(32);
+            var device = await GetOrCreateDevice(registryManager, request.DeviceId, primaryKey, secondaryKey, cancellationToken);
+            var summary = device.ToSummary();
+
+            return new JsonResult(summary, jsonSerializerOptions.Value);
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Could not add {device} with {deviceId} of '{requestDeviceId}'", nameof(Device), nameof(Device.Id), request.DeviceId);
             throw;
         }
-
-        var summary = new DeviceSummary
-        {
-            Id = device.Id,
-            ConnectionState = device.ConnectionState,
-            Status = device.Status,
-            AuthenticationType = device.Authentication.Type,
-            SymmetricPrimaryKey = device.Authentication.SymmetricKey?.PrimaryKey,
-            SymmetricSecondaryKey = device.Authentication.SymmetricKey?.SecondaryKey,
-            X509PrimaryThumbprint = device.Authentication.X509Thumbprint?.PrimaryThumbprint,
-            X509SecondaryThumbprint = device.Authentication.X509Thumbprint?.SecondaryThumbprint,
-        };
-
-        var jsonSettings = new JsonSerializerOptions(JsonSerializerDefaults.General)
-        {
-            PropertyNamingPolicy = ResolveJsonNamingPolicy(namingStrategy),
-        };
-
-        return new JsonResult(summary, jsonSettings);
     }
 
-    private static JsonNamingPolicy ResolveJsonNamingPolicy(string namingStrategy)
-    {
-        return string.IsNullOrWhiteSpace(namingStrategy) ? JsonNamingPolicy.CamelCase : namingStrategy switch
-        {
-            "snakeCaseUpper" => JsonNamingPolicy.SnakeCaseUpper,
-            "snakeCaseLower" => JsonNamingPolicy.SnakeCaseLower,
-            "kebabCaseUpper" => JsonNamingPolicy.KebabCaseUpper,
-            "kebabCaseLower" => JsonNamingPolicy.KebabCaseLower,
-            "capitalCase" => new JsonCapitalCaseNamingPolicy(),
-            _ => JsonNamingPolicy.CamelCase,
-        };
-    }
+    private static async Task<Device> GetOrCreateDevice(RegistryManager registryManager, string deviceId, string primaryKey, string secondaryKey, CancellationToken cancellationToken = default) =>
+        await registryManager.GetDeviceAsync(deviceId, cancellationToken) ??
+        await registryManager.AddDeviceAsync(
+            new Device(deviceId)
+            {
+                Authentication = new()
+                {
+                    Type = AuthenticationType.Sas,
+                    SymmetricKey = new()
+                    {
+                        PrimaryKey = primaryKey,
+                        SecondaryKey = secondaryKey,
+                    },
+                }
+            }, cancellationToken);
 
     private static string GenerateKey(int keySize)
     {
