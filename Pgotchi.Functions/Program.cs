@@ -22,10 +22,17 @@ var host = new HostBuilder()
             async context =>
             {
                 var requestData = await context.GetHttpRequestDataAsync();
-                var namingPolicy = Enum.Parse<ResponsePropertyNamingPolicy>(requestData?.Query["namingPolicy"] ?? string.Empty, true);
                 var jsonSerializerOptions = context.InstanceServices.GetRequiredService<IOptions<JsonSerializerOptions>>().Value;
+                var namingPolicyQuery = requestData?.Query["namingPolicy"] ?? string.Empty;
 
-                jsonSerializerOptions.PropertyNamingPolicy = ResolveJsonNamingPolicy(namingPolicy);
+                if (Enum.TryParse<ResponsePropertyNamingPolicy>(namingPolicyQuery, out var namingPolicy))
+                {
+                    jsonSerializerOptions.PropertyNamingPolicy = ResolveJsonNamingPolicy(namingPolicy);
+                }
+                else
+                {
+                    jsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                }
 
                 await next(context);
             });
