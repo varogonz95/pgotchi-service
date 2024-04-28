@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Devices;
 using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Pgotchi.Functions.Extensions;
+using System.Net;
 using System.Net.Http.Json;
 using System.Security.Cryptography;
 using System.Text.Json;
@@ -30,7 +32,7 @@ public sealed class DeviceSummary
     public Task<string> ToStringAsync() => JsonContent.Create(this).ReadAsStringAsync();
 }
 
-public class RegisterDevice(ILogger<RegisterDevice> logger, IOptions<AzureIotHubOptions> azureIotHubOptions, IOptions<JsonSerializerOptions> jsonSerializerOptions)
+public class RegisterDevice(ILogger<RegisterDevice> logger, IOptions<AzureIotHubOptions> azureIotHubOptions)
 {
 
     [Function("RegisterDevice")]
@@ -54,7 +56,7 @@ public class RegisterDevice(ILogger<RegisterDevice> logger, IOptions<AzureIotHub
             var device = await GetOrCreateDevice(registryManager, request.DeviceId, primaryKey, secondaryKey, cancellationToken);
             var summary = device.ToSummary();
 
-            return new JsonResult(summary, jsonSerializerOptions.Value);
+            return new DynamicJsonPropertyNamingResult(summary);
         }
         catch (Exception ex)
         {

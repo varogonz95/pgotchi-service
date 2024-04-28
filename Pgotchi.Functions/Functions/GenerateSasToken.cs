@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
@@ -71,11 +70,6 @@ public class GenerateSasToken(ILogger<GenerateSasToken> logger)
         var content = new SasTokenResponse(token, expiry);
         logger.LogDebug("Response content: {response}", await content.ToStringAsync());
 
-        return new ContentResult
-        {
-            StatusCode = StatusCodes.Status200OK,
-            Content = await content.ToStringAsync(),
-            ContentType = Constants.DefaultContentType,
-        };
+        return new DynamicJsonPropertyNamingResult(content);
     }
 }
