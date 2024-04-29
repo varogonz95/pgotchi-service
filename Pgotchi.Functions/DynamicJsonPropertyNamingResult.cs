@@ -24,12 +24,7 @@ public class DynamicJsonPropertyNamingResult(object value, HttpStatusCode status
             .Where(keyValue => keyValue.Key.Equals("propertyNaming", StringComparison.OrdinalIgnoreCase))
             .Select(kv => kv.Value)
             .FirstOrDefault(StringValues.Empty);
-        var couldParsePropertyNamingQueryParam = Enum.TryParse<ResponsePropertyNamingPolicy>(propertyNamingQuery, true, out var namingPolicy);
-
-        if (!couldParsePropertyNamingQueryParam)
-        {
-            throw new Exception($"Could not parse {propertyNamingQuery} to {nameof(ResponsePropertyNamingPolicy)}");
-        }
+        _ = Enum.TryParse<ResponsePropertyNamingPolicy>(propertyNamingQuery, true, out var namingPolicy);
 
         var registeredSerializerOptions = context.HttpContext.RequestServices.GetService<IOptions<JsonSerializerOptions>>()?.Value;
 #pragma warning disable CA1869 // Cache and reuse 'JsonSerializerOptions' instances
