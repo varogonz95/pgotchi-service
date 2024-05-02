@@ -2,7 +2,7 @@
 using System.Text;
 using System.Text.Json;
 
-namespace Pgotchi.Functions;
+namespace Pgotchi.Functions.Json;
 
 internal class JsonCapitalCaseNamingPolicy : JsonNamingPolicy
 {

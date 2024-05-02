@@ -5,7 +5,17 @@ using Microsoft.Extensions.Primitives;
 using System.Net;
 using System.Text.Json;
 
-namespace Pgotchi.Functions;
+namespace Pgotchi.Functions.Json;
+
+public enum ResponsePropertyNamingPolicy
+{
+    CamelCase = 0,
+    SnakeCaseUpper = 1,
+    SnakeCaseLower = 2,
+    KebabCaseUpper = 3,
+    KebabCaseLower = 4,
+    CapitalCase = 5,
+}
 
 public class DynamicJsonPropertyNamingResult(object value, HttpStatusCode statusCode = HttpStatusCode.OK) : IActionResult
 {
