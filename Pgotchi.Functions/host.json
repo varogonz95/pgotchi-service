@@ -8,5 +8,25 @@
       },
       "enableLiveMetricsFilters": true
     }
+  },
+  "extensions": {
+    "eventHubs": {
+      "maxEventBatchSize": 1,
+      "minEventBatchSize": 1,
+      "maxWaitTime": "00:01:00",
+      "batchCheckpointFrequency": 1,
+      "prefetchCount": 300,
+      "transportType": "amqpTcp",
+      "initialOffsetOptions": {
+        "type": "fromStart"
+      },
+      "clientRetryOptions": {
+        "mode": "exponential",
+        "tryTimeout": "00:01:00",
+        "delay": "00:00:00.80",
+        "maximumDelay": "00:01:00",
+        "maximumRetries": 3
+      }
+    }
   }
 }

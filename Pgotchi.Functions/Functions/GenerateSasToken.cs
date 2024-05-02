@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using Pgotchi.Functions.Json;
 using System.Globalization;
 using System.Net;
 using System.Net.Http.Json;
