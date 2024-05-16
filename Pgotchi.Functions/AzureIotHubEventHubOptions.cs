@@ -3,12 +3,12 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Pgotchi.Functions;
 
-public sealed class AzureIotHubOptions
+public sealed class AzureIotHubEventHubOptions
 {
-    public const string SectionName = "AzureIotHub";
+    public const string SectionName = "AzureIotHubEventHub";
 
     [Required]
-    public required string HostName { get; set; }
+    public required string Name { get; set; }
     
     [Required]
     public required string ConnectionString { get; set; }

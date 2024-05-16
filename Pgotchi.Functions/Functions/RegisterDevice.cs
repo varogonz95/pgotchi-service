@@ -30,7 +30,7 @@ public sealed class DeviceSummary
     public Task<string> ToStringAsync() => JsonContent.Create(this).ReadAsStringAsync();
 }
 
-public class RegisterDevice(ILogger<RegisterDevice> logger, IOptions<AzureIotHubOptions> azureIotHubOptions)
+public class RegisterDevice(ILogger<RegisterDevice> logger, IOptions<AzureIotHubEventHubOptions> azureIotHubOptions)
 {
 
     [Function("RegisterDevice")]
