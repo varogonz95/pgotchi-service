@@ -1,36 +1,26 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Devices;
+using Microsoft.Azure.Devices.Shared;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Pgotchi.Functions.Extensions;
 using Pgotchi.Functions.Json;
-using System.Net.Http.Json;
+using Pgotchi.Functions.Models;
 using System.Security.Cryptography;
+using System.Text.Json;
 using FromBodyAttribute = Microsoft.Azure.Functions.Worker.Http.FromBodyAttribute;
 
 namespace Pgotchi.Functions.Functions;
 
-public sealed class RegisterDeviceRequest
+[Serializable]
+public sealed class RegisterDeviceRequest(string deviceId, IDictionary<string, DevicePropertyValue> properties)
 {
-    public required string DeviceId { get; set; }
+    public string DeviceId { get; } = deviceId;
+    public IDictionary<string, DevicePropertyValue> Properties { get; } = properties ?? new Dictionary<string, DevicePropertyValue>();
 }
 
-public sealed class DeviceSummary
-{
-    public required string Id { get; set; }
-    public DeviceConnectionState ConnectionState { get; set; }
-    public DeviceStatus Status { get; set; }
-    public AuthenticationType AuthenticationType { get; set; }
-    public string? SymmetricPrimaryKey { get; set; }
-    public string? SymmetricSecondaryKey { get; set; }
-    public string? X509PrimaryThumbprint { get; set; }
-    public string? X509SecondaryThumbprint { get; set; }
-
-    public Task<string> ToStringAsync() => JsonContent.Create(this).ReadAsStringAsync();
-}
-
-public class RegisterDevice(ILogger<RegisterDevice> logger, IOptions<AzureIotHubEventHubOptions> azureIotHubOptions)
+public class RegisterDevice(ILogger<RegisterDevice> logger, IOptions<AzureIotHubOptions> azureIotHubOptions)
 {
 
     [Function("RegisterDevice")]
@@ -51,7 +41,7 @@ public class RegisterDevice(ILogger<RegisterDevice> logger, IOptions<AzureIotHub
             using var registryManager = RegistryManager.CreateFromConnectionString(azureIotHubOptions.Value.ConnectionString);
             var primaryKey = GenerateKey(32);
             var secondaryKey = GenerateKey(32);
-            var device = await GetOrCreateDevice(registryManager, request.DeviceId, primaryKey, secondaryKey, cancellationToken);
+            var device = await GetOrCreateDevice(registryManager, request, primaryKey, secondaryKey, cancellationToken);
             var summary = device.ToSummary();
 
             return new DynamicJsonPropertyNamingResult(summary);
@@ -63,10 +53,14 @@ public class RegisterDevice(ILogger<RegisterDevice> logger, IOptions<AzureIotHub
         }
     }
 
-    private static async Task<Device> GetOrCreateDevice(RegistryManager registryManager, string deviceId, string primaryKey, string secondaryKey, CancellationToken cancellationToken = default) =>
-        await registryManager.GetDeviceAsync(deviceId, cancellationToken) ??
-        await registryManager.AddDeviceAsync(
-            new Device(deviceId)
+    private static async Task<Device> GetOrCreateDevice(RegistryManager registryManager, RegisterDeviceRequest request, string primaryKey, string secondaryKey, CancellationToken cancellationToken = default)
+    {
+        var deviceId = request.DeviceId;
+        var device = await registryManager.GetDeviceAsync(deviceId, cancellationToken);
+
+        if (device == null)
+        {
+            device = new Device(deviceId)
             {
                 Authentication = new()
                 {
@@ -76,8 +70,41 @@ public class RegisterDevice(ILogger<RegisterDevice> logger, IOptions<AzureIotHub
                         PrimaryKey = primaryKey,
                         SecondaryKey = secondaryKey,
                     },
+                },
+            };
+
+            if (request.Properties.Count > 0)
+            {
+                var twinProperties = new TwinCollection();
+
+                //var mem = new MemoryStream();
+                //var reader = new StreamReader(mem);
+
+                foreach (var item in request.Properties)
+                {
+                    //await JsonSerializer.SerializeAsync(mem, item.Value, cancellationToken: cancellationToken);
+                    //twinProperties[item.Key] = await reader.ReadToEndAsync(cancellationToken);
+                    twinProperties[item.Key] = item.Value;
                 }
-            }, cancellationToken);
+
+                var twin = new Twin(deviceId);
+                twin.Properties.Desired = twinProperties;
+
+                var operation = await registryManager.AddDeviceWithTwinAsync(device, twin, cancellationToken);
+
+                if (operation.IsSuccessful)
+                {
+                    return device;
+                }
+
+                throw new Exception("An error occured registering a device with a twin");
+            }
+
+            return await registryManager.AddDeviceAsync(device, cancellationToken);
+        }
+
+        return device;
+    }
 
     private static string GenerateKey(int keySize)
     {

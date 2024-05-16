@@ -5,16 +5,27 @@ VisualStudioVersion = 17.7.34202.233
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pgotchi.Functions", "Pgotchi.Functions\Pgotchi.Functions.csproj", "{43B6FB69-05E6-453E-918B-91D0192E1D79}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pgotchi.WebApi", "Pgotchi.WebApi\Pgotchi.WebApi.csproj", "{08D07B4F-287E-4134-AD08-C823939A5EFE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug All|Any CPU = Debug All|Any CPU
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{43B6FB69-05E6-453E-918B-91D0192E1D79}.Debug All|Any CPU.ActiveCfg = Debug|Any CPU
+		{43B6FB69-05E6-453E-918B-91D0192E1D79}.Debug All|Any CPU.Build.0 = Debug|Any CPU
 		{43B6FB69-05E6-453E-918B-91D0192E1D79}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{43B6FB69-05E6-453E-918B-91D0192E1D79}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{43B6FB69-05E6-453E-918B-91D0192E1D79}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{43B6FB69-05E6-453E-918B-91D0192E1D79}.Release|Any CPU.Build.0 = Release|Any CPU
+		{08D07B4F-287E-4134-AD08-C823939A5EFE}.Debug All|Any CPU.ActiveCfg = Debug All|Any CPU
+		{08D07B4F-287E-4134-AD08-C823939A5EFE}.Debug All|Any CPU.Build.0 = Debug All|Any CPU
+		{08D07B4F-287E-4134-AD08-C823939A5EFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08D07B4F-287E-4134-AD08-C823939A5EFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08D07B4F-287E-4134-AD08-C823939A5EFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08D07B4F-287E-4134-AD08-C823939A5EFE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
