@@ -1,36 +1,13 @@
-﻿using Microsoft.Azure.Devices;
-using Microsoft.Azure.Devices.Shared;
-using Pgotchi.Functions.Models;
+﻿using AutoMapper;
+using Microsoft.Azure.Devices;
+using Pgotchi.Shared.Models;
+using System.Text.Json;
 
 namespace Pgotchi.Functions.Extensions;
 
 internal static class HelperExtensions
 {
-    public static DeviceSummary ToSummary(this Device device) => new()
-    {
-        Id = device.Id,
-        ConnectionState = device.ConnectionState,
-        Status = device.Status,
-        AuthenticationType = device.Authentication.Type,
-        SymmetricPrimaryKey = device.Authentication.SymmetricKey?.PrimaryKey,
-        SymmetricSecondaryKey = device.Authentication.SymmetricKey?.SecondaryKey,
-        X509PrimaryThumbprint = device.Authentication.X509Thumbprint?.PrimaryThumbprint,
-        X509SecondaryThumbprint = device.Authentication.X509Thumbprint?.SecondaryThumbprint,
-    };
-
-    public static DeviceWithTwinSummary ToSummaryWithTwin(this Device device, Twin twin) => new(twin)
-    {
-        Id = device.Id,
-        ConnectionState = device.ConnectionState,
-        Status = device.Status,
-        AuthenticationType = device.Authentication.Type,
-        SymmetricPrimaryKey = device.Authentication.SymmetricKey?.PrimaryKey,
-        SymmetricSecondaryKey = device.Authentication.SymmetricKey?.SecondaryKey,
-        X509PrimaryThumbprint = device.Authentication.X509Thumbprint?.PrimaryThumbprint,
-        X509SecondaryThumbprint = device.Authentication.X509Thumbprint?.SecondaryThumbprint,
-    };
-
-    public static async Task<DeviceWithTwinSummary?> GetDeviceWithTwinAsync(this RegistryManager registryManager, string deviceId, CancellationToken cancellationToken = default)
+    public static async Task<DeviceTwinSummary?> GetDeviceWithTwinAsync(this RegistryManager registryManager, string deviceId, IMapper mapper, CancellationToken cancellationToken = default)
     {
         var device = await registryManager.GetDeviceAsync(deviceId, cancellationToken);
 
@@ -39,6 +16,9 @@ internal static class HelperExtensions
 
         var twin = await registryManager.GetTwinAsync(deviceId, cancellationToken);
 
-        return device.ToSummaryWithTwin(twin);
+        return mapper.Map<DeviceTwinSummary>(twin);
     }
+
+
+    public static string ToJson(this DevicePropertyValue devicePropertyValue) => JsonSerializer.Serialize(devicePropertyValue);
 }

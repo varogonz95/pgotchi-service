@@ -1,3 +1,5 @@
+using Azure;
+using Azure.Messaging.EventHubs;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
@@ -6,6 +8,12 @@ using Microsoft.Extensions.Logging;
 
 namespace Pgotchi.Functions.Functions
 {
+    public static class ConsumerGroups
+    {
+        public const string Default = "$Default";
+        public const string WebClients = "webclients";
+    }
+
     [SignalRConnection("AzureSignalR:ConnectionString")]
     public class DeviceTelemetryHub(ILogger<DeviceTelemetryHub> logger, IServiceProvider serviceProvider) : ServerlessHub(serviceProvider)
     {
@@ -22,22 +30,32 @@ namespace Pgotchi.Functions.Functions
             var bodyStr = await req.ReadAsStringAsync();
             logger.LogDebug("Request body:\n{0}", bodyStr);
 
-            var negotiateResponse = await NegotiateAsync(new() { UserId = "test-user-id", });
+             var negotiateResponse = await NegotiateAsync(new() { UserId = "test-user-id", });
+            
             var response = req.CreateResponse();
+            response.Headers.Add("Content-Type", "application/json");
+            
             await response.WriteBytesAsync(negotiateResponse.ToArray());
+            
             return response;
         }
 
-        //public Task Broadcast([SignalRTrigger("messages", "broadcast", "message")] SignalRInvocationContext invocationContext, CancellationToken cancellationToken)
-        //{
-        //    return Clients.All.SendAsync("newMessage", new NewMessage(invocationContext, "pong"), cancellationToken: cancellationToken);
-        //}
+        [Function(nameof(Broadcast))]
+        public Task Broadcast(
+            [EventHubTrigger("%AzureIotHubEventHub:Name%", Connection = "AzureIotHubEventHub:ConnectionString", ConsumerGroup = ConsumerGroups.WebClients, IsBatched = false)]
+            EventData eventData,
+            CancellationToken cancellationToken)
+        {
+            var data = eventData.EventBody.ToObjectFromJson<IDictionary<string, object>>();
+
+            return Clients.All.SendAsync("newMessage", data, cancellationToken: cancellationToken);
+        }
     }
 
-    public class NewMessage(SignalRInvocationContext invocationContext, string message)
+    public class NewMessage(SignalRInvocationContext context, string message)
     {
-        public string ConnectionId { get; } = invocationContext.ConnectionId;
-        public string Sender { get; } = string.IsNullOrEmpty(invocationContext.UserId) ? string.Empty : invocationContext.UserId;
+        public string ConnectionId { get; } = context.ConnectionId;
+        public string Sender { get; } = string.IsNullOrEmpty(context.UserId) ? string.Empty : context.UserId;
         public string Text { get; } = message;
     }
 }

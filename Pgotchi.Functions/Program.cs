@@ -1,29 +1,37 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Pgotchi.Functions;
 using Pgotchi.Functions.Functions;
+using Pgotchi.Shared;
+using Pgotchi.Shared.Options;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 
 var host = new HostBuilder()
     .ConfigureFunctionsWebApplication((builder) =>
     {
-        builder.Services.AddOptions<AzureIotHubOptions>()
+        var services = builder.Services;
+
+        services.AddOptions<AzureIotHubOptions>()
             .BindConfiguration(AzureIotHubOptions.SectionName)
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
-        builder.Services.AddOptions<AzureIotHubEventHubOptions>()
+        services.AddOptions<AzureIotHubEventHubOptions>()
             .BindConfiguration(AzureIotHubEventHubOptions.SectionName)
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
-        builder.Services.Configure<JsonSerializerOptions>(options =>
+        services.Configure<JsonSerializerOptions>(options =>
         {
             options.Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
         });
 
-        builder.Services.AddServerlessHub<DeviceTelemetryHub>();
+        services.AddServerlessHub<DeviceTelemetryHub>();
+
+        services.AddAutoMapper(config =>
+        {
+            config.AddProfile<DataProfile>();
+        });
     })
     .Build();
 

@@ -1,7 +1,6 @@
 ﻿using Microsoft.Azure.Devices;
-using System.Net.Http.Json;
 
-namespace Pgotchi.Functions.Models;
+namespace Pgotchi.Shared.Models;
 
 public class DeviceSummary
 {
@@ -13,6 +12,5 @@ public class DeviceSummary
     public string? SymmetricSecondaryKey { get; set; }
     public string? X509PrimaryThumbprint { get; set; }
     public string? X509SecondaryThumbprint { get; set; }
-
-    public Task<string> ToStringAsync() => JsonContent.Create(this).ReadAsStringAsync();
+    public DateTime LastActivityTime {  get; set; }
 }

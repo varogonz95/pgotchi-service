@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pgotchi.Functions", "Pgotch
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pgotchi.WebApi", "Pgotchi.WebApi\Pgotchi.WebApi.csproj", "{08D07B4F-287E-4134-AD08-C823939A5EFE}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pgotchi.Shared", "Pgotchi.Core\Pgotchi.Shared.csproj", "{EED07932-E93A-4DCA-83DF-D8C24544B342}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug All|Any CPU = Debug All|Any CPU
@@ -26,6 +28,12 @@ Global
 		{08D07B4F-287E-4134-AD08-C823939A5EFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{08D07B4F-287E-4134-AD08-C823939A5EFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{08D07B4F-287E-4134-AD08-C823939A5EFE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EED07932-E93A-4DCA-83DF-D8C24544B342}.Debug All|Any CPU.ActiveCfg = Debug|Any CPU
+		{EED07932-E93A-4DCA-83DF-D8C24544B342}.Debug All|Any CPU.Build.0 = Debug|Any CPU
+		{EED07932-E93A-4DCA-83DF-D8C24544B342}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EED07932-E93A-4DCA-83DF-D8C24544B342}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EED07932-E93A-4DCA-83DF-D8C24544B342}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EED07932-E93A-4DCA-83DF-D8C24544B342}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

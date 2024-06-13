@@ -1,7 +1,6 @@
-﻿
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace Pgotchi.Functions;
+namespace Pgotchi.Shared.Options;
 
 public sealed class AzureIotHubEventHubOptions
 {
@@ -9,7 +8,7 @@ public sealed class AzureIotHubEventHubOptions
 
     [Required]
     public required string Name { get; set; }
-    
+
     [Required]
     public required string ConnectionString { get; set; }
 

@@ -1,15 +1,16 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Devices;
-using Newtonsoft.Json;
-using Pgotchi.WebApi.Models;
+using Pgotchi.Shared.Models;
+using Pgotchi.Shared.Services;
 
 namespace Pgotchi.WebApi.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class DeviceController(ILogger<DeviceController> logger) : ControllerBase
+public class DeviceController(ILogger<DeviceController> logger, IMapper mapper, IDeviceService deviceService) : ControllerBase
 {
-    private const string AzureIotHubConnectionString = "";
+    private const string AzureIotHubConnectionString = "HostName=pgotchi-dev-east-iothub.azure-devices.net;SharedAccessKeyName=registryRead;SharedAccessKey=OEPQ3Mby0lmdkoeYtIuq5IAud+nmqVrbDAIoTD0wZI4=";
 
     [HttpGet()]
     public async Task<IActionResult> ListDevices([FromQuery] int? pageSize = 100)
@@ -17,8 +18,8 @@ public class DeviceController(ILogger<DeviceController> logger) : ControllerBase
         using var registryManager = RegistryManager.CreateFromConnectionString(AzureIotHubConnectionString);
 
         var devicesQuery = registryManager.CreateQuery("select * from Devices", pageSize);
-        var jsons = await devicesQuery.GetNextAsJsonAsync();
-        var devices = jsons.Select(json => JsonConvert.DeserializeObject<DeviceSummary>(json));
+        var twins = await devicesQuery.GetNextAsTwinAsync();
+        var devices = twins.Select(mapper.Map<DeviceTwinSummary>);
 
         return Ok(devices);
     }
@@ -33,9 +34,17 @@ public class DeviceController(ILogger<DeviceController> logger) : ControllerBase
         using var registryManager = RegistryManager.CreateFromConnectionString(AzureIotHubConnectionString);
 
         var devicesQuery = registryManager.CreateQuery($"select * from Devices where deviceId = '{deviceId}'", 1);
-        var jsons = await devicesQuery.GetNextAsJsonAsync();
-        var device = jsons.SingleOrDefault();
+        var twins = await devicesQuery.GetNextAsTwinAsync();
+        var summary = mapper.Map<DeviceTwinSummary>(twins.SingleOrDefault());
 
-        return Ok(device);
+        return Ok(summary);
     }
+
+    //[HttpPost]
+    //public async Task<IActionResult> RegisterDevice([FromBody] RegisterDeviceRequest request)
+    //{
+    //    ArgumentNullException.ThrowIfNull(request);
+
+    //    DeviceSummary summary = await deviceService.RegisterDeviceAsync(request);
+    //}
 }

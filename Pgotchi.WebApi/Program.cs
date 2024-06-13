@@ -1,22 +1,30 @@
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
+using Pgotchi.Shared;
+using Pgotchi.WebApi;
 
 var builder = WebApplication.CreateBuilder(args);
+var services = builder.Services;
 
 // Add services to the container.
-
-builder.Services
+services
     .AddControllers()
     .AddNewtonsoftJson(setup =>
     {
         var namingStrategy = new CamelCaseNamingStrategy();
-        setup.SerializerSettings.Converters.Add(new StringEnumConverter(namingStrategy));
+        setup.SerializerSettings.Converters.Add(new StringEnumConverter());
     });
 
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+services.AddEndpointsApiExplorer();
+services.AddSwaggerGen();
+services.AddAutoMapper(config =>
+{
+    config.AddProfile<DataProfile>();
+});
+
+AppServiceConfiguration.RegisterServices(services);
 
 var app = builder.Build();
 
@@ -35,6 +43,8 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
+app.UseRouting();
+
 app.MapControllers();
 
-app.Run();
+await app.RunAsync();
