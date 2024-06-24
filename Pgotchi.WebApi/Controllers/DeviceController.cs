@@ -1,50 +1,54 @@
-using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Devices;
 using Pgotchi.Shared.Models;
+using Pgotchi.Shared.Requests;
 using Pgotchi.Shared.Services;
 
 namespace Pgotchi.WebApi.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class DeviceController(ILogger<DeviceController> logger, IMapper mapper, IDeviceService deviceService) : ControllerBase
+public class DeviceController(ILogger<DeviceController> logger, IDeviceService deviceService) : ControllerBase
 {
-    private const string AzureIotHubConnectionString = "HostName=pgotchi-dev-east-iothub.azure-devices.net;SharedAccessKeyName=registryRead;SharedAccessKey=OEPQ3Mby0lmdkoeYtIuq5IAud+nmqVrbDAIoTD0wZI4=";
-
     [HttpGet()]
-    public async Task<IActionResult> ListDevices([FromQuery] int? pageSize = 100)
+    public async Task<IActionResult> ListDevices(CancellationToken cancellationToken, [FromQuery] int? pageSize = 100)
     {
-        using var registryManager = RegistryManager.CreateFromConnectionString(AzureIotHubConnectionString);
-
-        var devicesQuery = registryManager.CreateQuery("select * from Devices", pageSize);
-        var twins = await devicesQuery.GetNextAsTwinAsync();
-        var devices = twins.Select(mapper.Map<DeviceTwinSummary>);
+        var devices = await deviceService.GetDeviceTwinSummariesAsync(pageSize, cancellationToken);
 
         return Ok(devices);
     }
 
 
     [HttpGet("{deviceId}")]
-    public async Task<IActionResult> FindById([FromRoute] string deviceId)
+    public async Task<IActionResult> FindById([FromRoute] string deviceId, CancellationToken cancellationToken)
     {
         if (string.IsNullOrEmpty(deviceId))
             throw new ArgumentException($"'{nameof(deviceId)}' cannot be null or empty.", nameof(deviceId));
 
-        using var registryManager = RegistryManager.CreateFromConnectionString(AzureIotHubConnectionString);
-
-        var devicesQuery = registryManager.CreateQuery($"select * from Devices where deviceId = '{deviceId}'", 1);
-        var twins = await devicesQuery.GetNextAsTwinAsync();
-        var summary = mapper.Map<DeviceTwinSummary>(twins.SingleOrDefault());
+        var summary = await deviceService.GetDeviceTwinSummaryAsync(deviceId, cancellationToken);
 
         return Ok(summary);
     }
 
-    //[HttpPost]
-    //public async Task<IActionResult> RegisterDevice([FromBody] RegisterDeviceRequest request)
-    //{
-    //    ArgumentNullException.ThrowIfNull(request);
+    [HttpPost]
+    public async Task<IActionResult> RegisterDevice([FromBody] RegisterDeviceRequest request, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(request);
 
-    //    DeviceSummary summary = await deviceService.RegisterDeviceAsync(request);
-    //}
+        var validator = new RegisterDeviceRequestValidator();
+        var validation = validator.Validate(request);
+
+        if (!validation.IsValid)
+        {
+            var errorDetails = validation.Errors
+                .GroupBy(err => err.PropertyName, err => err.ErrorMessage)
+                .ToDictionary(err => err.Key, err => err.ToArray());
+
+            var problemDetails = new ValidationProblemDetails(errorDetails);
+            return ValidationProblem(problemDetails);
+        }
+
+        var summary = await deviceService.RegisterDeviceAsync(request, cancellationToken);
+
+        return Ok(summary);
+    }
 }

@@ -20,6 +20,9 @@ public class DataProfile : Profile
 
         CreateMap<Twin, DeviceTwinSummary>()
             .ForMember(dst => dst.Id, opt => opt.MapFrom(src => src.DeviceId))
+            .ForMember(
+                dst => dst.UserId, 
+                opt => opt.MapFrom(src => src.Tags.Contains(TwinTags.UserId) ? src.Tags[TwinTags.UserId] : null))
             .ForMember(dst => dst.X509PrimaryThumbprint, opt => opt.MapFrom(src => src.X509Thumbprint.PrimaryThumbprint))
             .ForMember(dst => dst.X509SecondaryThumbprint, opt => opt.MapFrom(src => src.X509Thumbprint.SecondaryThumbprint))
             .ForMember(dst => dst.Properties, opt => opt.MapFrom(src => src.Properties.Desired))
